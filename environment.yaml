@@ -1,0 +1,15 @@
+name: nano-gpt
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.10
+  - cudatoolkit=11.3
+  - pytorch=1.12.1
+  - numpy
+  - matplotlib
+  - requests
+  - ipykernel
+  - pip
+  - pip:
+    - lovely-tensors
