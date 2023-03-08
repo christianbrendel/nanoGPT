@@ -3,16 +3,29 @@ import torch.nn as nn
 from torch.nn import functional as F
 
 # hyperparameters
-batch_size = 64
-block_size = 256
+# batch_size = 64
+# block_size = 256
+# max_iters = 5000
+# eval_interval = 500
+# learning_rate = 3e-4
+# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# eval_iters = 200
+# n_embd = 384
+# n_layer = 6
+# n_head =  6
+# dropout = 0.2
+
+
+batch_size = 32
+block_size = 8
 max_iters = 5000
 eval_interval = 500
 learning_rate = 3e-4
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 eval_iters = 200
-n_embd = 384
-n_layer = 6
-n_head =  6
+n_embd = 64
+n_layer = 3
+n_head =  4
 dropout = 0.2
 
 
@@ -74,16 +87,27 @@ class Head(nn.Module):
     def forward(self, x):
         B, T, C = x.shape
 
+        print("x.shape", x.shape)
+
         k = self.key(x)
         q = self.query(x)
 
+        
         wei = q @ k.transpose(-2, -1)  * (C ** -0.5)
         wei = wei.masked_fill(self.tril[:T, :T] == 0, float("-inf"))
         wei = F.softmax(wei, dim=-1)
+        
         wei = self.dropout(wei)
 
         v = self.value(x)
         out = wei @ v
+
+        print("q.shape", q.shape)
+        print("k.shape", k.shape)
+        print("v.shape", v.shape)
+        print("wei.shape", wei.shape)
+        print("out.shape", out.shape)
+
         return out
 
 class MultiHeadAttention(nn.Module):
@@ -121,13 +145,19 @@ class Block(nn.Module):
         super().__init__()
         head_size = n_embd // n_head
         self.sa = MultiHeadAttention(n_head, head_size)
-        self.ffwd = FeedForward(n_embd)
         self.ln1 = nn.LayerNorm(n_embd)
+        self.ffwd = FeedForward(n_embd)
         self.ln2 = nn.LayerNorm(n_embd)
 
     def forward(self, x):
+
+        # print("x.shape", x.shape)
+
         x = x + self.sa(self.ln1(x))
         x = x + self.ffwd(self.ln2(x))  
+
+        # print("x.shape", x.shape)
+
         return x
 
 
@@ -213,6 +243,8 @@ for iter in range(max_iters):
     optimizer.zero_grad(set_to_none=True)
     loss.backward()
     optimizer.step()
+
+    exit()
 
 # generate text
 context = torch.zeros(1, 1, dtype=torch.long).to(device)
