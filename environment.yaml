@@ -13,3 +13,6 @@ dependencies:
   - pip
   - pip:
     - lovely-tensors
+    - black
+    - isort
+    - pre-commit

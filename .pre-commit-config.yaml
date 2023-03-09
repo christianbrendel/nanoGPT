@@ -1,0 +1,24 @@
+repos:
+- repo: https://github.com/psf/black
+  rev: 20.8b1
+  hooks:
+      - id: black
+- repo: https://gitlab.com/pycqa/flake8
+  rev: 3.8.4
+  hooks:
+      - id: flake8
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v3.4.0  # Use the ref you want to point at
+  hooks:
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: detect-aws-credentials
+        args: ['--allow-missing-credentials']
+      - id: detect-private-key
+      - id: no-commit-to-branch
+        args: ['--branch', 'master']
+      - id: pretty-format-json
+        args: ['--autofix']
+      - id: requirements-txt-fixer
