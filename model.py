@@ -32,7 +32,7 @@ class AttentionHead(nn.Module):
         k = self.key(x)
         v = self.value(x)
 
-        wei = q @ k.transpose(-2, -1) * (C**-0.5)
+        wei = q @ k.transpose(-2, -1) * (C ** -0.5)
         wei = wei.masked_fill(self.tril[:T, :T] == 0, float("-inf"))
         wei = F.softmax(wei, dim=-1)
         wei = self.dropout(wei)
@@ -120,6 +120,9 @@ class LanguageModel(nn.Module):
     ):
         super().__init__()
 
+        # store block_size for generation function
+        self.block_size = block_size
+
         # embedding tables
         self.token_embedding_table = nn.Embedding(vocab_size, d_model)
         self.position_embedding_table = nn.Embedding(block_size, d_model)
@@ -173,3 +176,26 @@ class LanguageModel(nn.Module):
             loss = F.cross_entropy(logits, targets)
 
         return logits, loss
+
+    def generate(self, idx, max_new_tokens):
+        # idx is a (B, T) tensor of indives in the current context
+        for _ in range(max_new_tokens):
+            # crop idx to the last block_size tokens
+            idx_cond = idx[:, -self.block_size :]
+
+            # get predictions for the next token
+            logits, _ = self(idx_cond)
+
+            # only focus on the last one
+            logits = logits[:, -1, :]
+
+            # apply softmax to get probabilities
+            probs = F.softmax(logits, dim=-1)
+
+            # sample from the distribution
+            idx_next = torch.multinomial(probs, num_samples=1)
+
+            # append the new token to the context
+            idx = torch.cat([idx, idx_next], dim=-1)
+
+        return idx
