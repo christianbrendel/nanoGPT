@@ -86,7 +86,7 @@ Lawly pillance, w
 
 ### 😵‍💫 Untrained larger model
 
-For comparison here is an example text the is produced by an untrained transformer,the larger model in this case:
+For comparison here is an example text the is produced by an untrained transformer, the larger model in this case:
  
 ```
 hn;.h;'IyiwHhuRDilRrYfAVeqhbo'kKxoLZbKH?$;KZe3qCxA:upQHLg$doVdAaieqsfpK
